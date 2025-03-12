@@ -2,6 +2,7 @@ package com.lsukys.codechella.controller;
 
 import com.lsukys.codechella.entity.dtos.EventoDto;
 import com.lsukys.codechella.service.EventoService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -31,7 +32,6 @@ public class EventoController {
     @GetMapping(value = "/categoria/{tipo}", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public Flux<EventoDto> obterPorTipo(@PathVariable String tipo) {
         return Flux.merge(eventoService.obterPorTipo(tipo), eventosSink.asFlux()).delayElements(Duration.ofSeconds(4));
-
     }
 
     @GetMapping("/{id}")
@@ -40,6 +40,7 @@ public class EventoController {
     }
 
     @PostMapping()
+    @ResponseStatus(HttpStatus.CREATED)
     public Mono<EventoDto> criarEvento(@RequestBody EventoDto eventoDto) {
         return eventoService.cadastrar(eventoDto).doOnSuccess(eventosSink::tryEmitNext);
     }
